@@ -1,0 +1,166 @@
+variables:
+
+stages:           
+  - build
+  - deploy
+
+#########################
+# Dev / Test Build
+#########################
+build-besi_dev-test-update_db:        
+  stage: build
+
+  artifacts:
+    paths:
+      - db_scripts_dev_test.tar.gz
+    public: false
+
+  script:
+    - echo "BEGIN - Zipping database scripts for development and test ..."
+    - if (Test-Path db_scripts_dev_test.tar.gz) { Remove-Item db_scripts_dev_test.tar.gz }
+    - tar -czf db_scripts_dev_test.tar.gz  -C 'DB scripts\ANLB' .
+    - echo "END - Database scripts zipped"
+
+  environment:
+    name: development
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - DB scripts/ANLB/masterdata/masterdataBesi.sql
+        - DB scripts/ANLB/besi/*
+        - DB scripts/ANLB/geoweb/geowebBesi.sql
+        - DB scripts/ANLB/geoserver/geoserverBesi.sql
+        - DB scripts/ANLB/dso/*
+        - DB scripts/ANLB/BESI-MASTER.sql
+        - DB scripts/ANLB/.gitlab-ci-Besi.yml
+
+#########################
+# Dev Update database
+#########################
+deploy-besi_dev_update_db:
+  stage: deploy   
+
+  needs:
+    - build-besi_dev-test-update_db
+
+  script:
+    - echo "Update database on development..."
+    - scp -i C:/Users/gitlabRunner/gitlabRunner db_scripts_dev_test.tar.gz postgres@172.16.2.19:/data/Gitlab-Deployments/
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.2.19 "cd /data/Gitlab-Deployments && rm -rf db-scripts && mkdir db-scripts && tar -xzf db_scripts_dev_test.tar.gz -C ./db-scripts && exit"
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.2.19 "cd /data/Gitlab-Deployments/db-scripts && psql -f BESI-MASTER.sql -U postgres -d anlb --single-transaction && exit"
+    - echo "Database updated on development."
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - DB scripts/ANLB/masterdata/masterdataBesi.sql
+        - DB scripts/ANLB/besi/*
+        - DB scripts/ANLB/geoweb/geowebBesi.sql
+        - DB scripts/ANLB/geoserver/geoserverBesi.sql
+        - DB scripts/ANLB/dso/*
+        - DB scripts/ANLB/BESI-MASTER.sql
+        - DB scripts/ANLB/.gitlab-ci-Besi.yml
+
+  environment:
+    name: development 
+    
+#########################
+# Test Update database
+#########################    
+deploy-besi_test_update_db:       
+  stage: deploy   
+
+  needs:
+    - build-besi_dev-test-update_db
+
+  script:
+    - echo "Update database on test..."
+    - scp -i C:/Users/gitlabRunner/gitlabRunner db_scripts_dev_test.tar.gz postgres@172.16.2.17:/data/Gitlab-Deployments/
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.2.17 "cd /data/Gitlab-Deployments && rm -rf db-scripts && mkdir db-scripts && tar -xzf db_scripts_dev_test.tar.gz -C ./db-scripts && exit"
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.2.17 "cd /data/Gitlab-Deployments/db-scripts && psql -f BESI-MASTER.sql -U postgres -d anlb --single-transaction && exit"
+    - echo "Database updated on test."
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - DB scripts/ANLB/masterdata/masterdataBesi.sql
+        - DB scripts/ANLB/besi/*
+        - DB scripts/ANLB/geoweb/geowebBesi.sql
+        - DB scripts/ANLB/geoserver/geoserverBesi.sql
+        - DB scripts/ANLB/dso/*
+        - DB scripts/ANLB/BESI-MASTER.sql
+        - DB scripts/ANLB/.gitlab-ci-Besi.yml
+      when: manual
+
+  environment:
+    name: test     
+
+##################################
+# Acceptance / Production build
+##################################
+build-besi_acc-prod-update_db:        
+  stage: build
+
+  artifacts:
+    paths:
+      - db_scripts_acc_prod.tar.gz
+    public: false
+
+  script:
+    - echo "BEGIN - Zipping database scripts for acceptance and production ..."
+    - if (Test-Path db_scripts_acc_prod.tar.gz) { Remove-Item db_scripts_acc_prod.tar.gz }
+    - tar -czf db_scripts_acc_prod.tar.gz  -C 'DB scripts\ANLB' .
+    - echo "END - Database scripts zipped"
+
+  environment:
+    name: acceptance
+
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+-BESI$/'
+
+###############################
+# Accpetance Update database
+###############################    
+deploy-besi_acc_update_db:       
+  stage: deploy   
+
+  needs:
+    - build-besi_acc-prod-update_db
+
+  script:
+    - echo "Update database on acceptance..."
+    - scp -i C:/Users/gitlabRunner/gitlabRunner db_scripts_acc_prod.tar.gz postgres@172.16.1.37:/data/Gitlab-Deployments/
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.1.37 "cd /data/Gitlab-Deployments && rm -rf db-scripts && mkdir db-scripts && tar -xzf db_scripts_acc_prod.tar.gz -C ./db-scripts && exit"
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.1.37 "cd /data/Gitlab-Deployments/db-scripts && psql -f BESI-MASTER.sql -U postgres -d anlb --single-transaction && exit"
+    - echo "Database updated on acceptance."
+
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+-BESI$/'
+      when: manual
+
+  environment:
+    name: acceptance     
+    
+###############################
+# Production Update database
+###############################        
+deploy-besi_prod_update_db:       
+  stage: deploy   
+
+  needs:
+    - build-besi_acc-prod-update_db
+
+  script:
+    - echo "Update database on production ..."
+    - scp -i C:/Users/gitlabRunner/gitlabRunner db_scripts_acc_prod.tar.gz postgres@172.16.1.38:/data/Gitlab-Deployments/
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.1.38 "cd /data/Gitlab-Deployments && rm -rf db-scripts && mkdir db-scripts && tar -xzf db_scripts_acc_prod.tar.gz -C ./db-scripts && exit"
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.1.38 "cd /data/Gitlab-Deployments/db-scripts && psql -f BESI-MASTER.sql -U postgres -d anlb --single-transaction && exit"
+    - echo "Database updated on production."
+
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+-BESI$/'
+      when: manual
+
+  environment:
+    name: production         
