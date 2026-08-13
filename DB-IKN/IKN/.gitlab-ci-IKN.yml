@@ -1,0 +1,163 @@
+variables:
+
+stages:           
+  - build
+  - deploy
+
+#########################
+# Dev / Test Build
+#########################
+build-ikn_dev-test-update_db:        
+  stage: build
+
+  artifacts:
+    paths:
+      - db_scripts_dev_test.tar.gz
+    public: false
+
+  script:
+    - echo "BEGIN - Zipping database scripts for development and test ..."
+    - if (Test-Path db_scripts_dev_test.tar.gz) { Remove-Item db_scripts_dev_test.tar.gz }
+    - tar -czf db_scripts_dev_test.tar.gz  -C 'DB scripts\IKN' .
+    - echo "END - Database scripts zipped"
+
+  environment:
+    name: development
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - DB scripts/IKN/etl/Initial-ETL-Script.sql
+        - DB scripts/IKN/masterdata/masterdata.sql
+        - DB scripts/IKN/geoweb/geoweb.sql
+        - DB scripts/IKN/geoserver/geoserver.sql
+        - DB scripts/IKN/imna/imna.sql
+        - DB scripts/IKN/.gitlab-ci-IKN.yml
+
+#########################
+# Dev Update database
+#########################
+deploy-ikn_dev_update_db:
+  stage: deploy   
+
+  needs:
+    - build-ikn_dev-test-update_db
+
+  script:
+    - echo "Update database on development..."
+    - scp -i C:/Users/gitlabRunner/gitlabRunner db_scripts_dev_test.tar.gz postgres@172.16.2.19:/data/Gitlab-Deployments/
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.2.19 "cd /data/Gitlab-Deployments && rm -rf db-scripts && mkdir db-scripts && tar -xzf db_scripts_dev_test.tar.gz -C ./db-scripts && exit"
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.2.19 "cd /data/Gitlab-Deployments/db-scripts && psql -f IKN-Main.sql -U postgres -d ikn --single-transaction && exit"
+    - echo "Database updated on development."
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - DB scripts/IKN/etl/*
+        - DB scripts/IKN/masterdata/*
+        - DB scripts/IKN/geoweb/*
+        - DB scripts/IKN/geoserver/*
+        - DB scripts/IKN/imna/*
+        - DB scripts/IKN/.gitlab-ci-IKN.yml
+
+  environment:
+    name: development 
+    
+#########################
+# Test Update database
+#########################    
+deploy-ikn_test_update_db:       
+  stage: deploy   
+
+  needs:
+    - build-ikn_dev-test-update_db
+
+  script:
+    - echo "Update database on test..."
+    - scp -i C:/Users/gitlabRunner/gitlabRunner db_scripts_dev_test.tar.gz postgres@172.16.2.17:/data/Gitlab-Deployments/
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.2.17 "cd /data/Gitlab-Deployments && rm -rf db-scripts && mkdir db-scripts && tar -xzf db_scripts_dev_test.tar.gz -C ./db-scripts && exit"
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.2.17 "cd /data/Gitlab-Deployments/db-scripts && psql -f IKN-Main.sql -U postgres -d ikn --single-transaction && exit"
+    - echo "Database updated on test."
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - DB scripts/IKN/etl/*
+        - DB scripts/IKN/masterdata/*
+        - DB scripts/IKN/geoweb/*
+        - DB scripts/IKN/geoserver/*
+        - DB scripts/IKN/imna/*
+        - DB scripts/IKN/.gitlab-ci-IKN.yml
+      when: manual
+
+  environment:
+    name: test     
+
+##################################
+# Acceptance / Production build
+##################################
+build-ikn_acc-prod-update_db:        
+  stage: build
+
+  artifacts:
+    paths:
+      - db_scripts_acc_prod.tar.gz
+    public: false
+
+  script:
+    - echo "BEGIN - Zipping database scripts for acceptance and production ..."
+    - if (Test-Path db_scripts_acc_prod.tar.gz) { Remove-Item db_scripts_acc_prod.tar.gz }
+    - tar -czf db_scripts_acc_prod.tar.gz  -C 'DB scripts\IKN' .
+    - echo "END - Database scripts zipped"
+
+  environment:
+    name: acceptance
+
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+-IKN$/'
+
+###############################
+# Accpetance Update database
+###############################    
+deploy-ikn_acc_update_db:       
+  stage: deploy   
+
+  needs:
+    - build-ikn_acc-prod-update_db
+
+  script:
+    - echo "Update database on acceptance..."
+    - scp -i C:/Users/gitlabRunner/gitlabRunner db_scripts_acc_prod.tar.gz postgres@172.16.1.27:/data/Gitlab-Deployments/
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.1.27 "cd /data/Gitlab-Deployments && rm -rf db-scripts && mkdir db-scripts && tar -xzf db_scripts_acc_prod.tar.gz -C ./db-scripts && exit"
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.1.27 "cd /data/Gitlab-Deployments/db-scripts && psql -f IKN-Main.sql -U postgres -d ikn --single-transaction && exit"
+    - echo "Database updated on acceptance."
+
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+-IKN$/'
+      when: manual
+
+  environment:
+    name: acceptance     
+    
+###############################
+# Production Update database
+###############################        
+deploy-ikn_prod_update_db:       
+  stage: deploy   
+
+  needs:
+    - build-ikn_acc-prod-update_db
+
+  script:
+    - echo "Update database on production ..."
+    - scp -i C:/Users/gitlabRunner/gitlabRunner db_scripts_acc_prod.tar.gz postgres@172.16.1.29:/data/Gitlab-Deployments/
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.1.29 "cd /data/Gitlab-Deployments && rm -rf db-scripts && mkdir db-scripts && tar -xzf db_scripts_acc_prod.tar.gz -C ./db-scripts && exit"
+    - ssh -i C:/Users/gitlabRunner/gitlabRunner postgres@172.16.1.29 "cd /data/Gitlab-Deployments/db-scripts && psql -f IKN-Main.sql -U postgres -d ikn --single-transaction && exit"
+    - echo "Database updated on production."
+
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+-IKN$/'
+      when: manual
+
+  environment:
+    name: production         
