@@ -1,0 +1,12 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<global.templateGPKG>$(FME_SHAREDRESOURCE_DATA)/NDVH/GPKG Template/NDVH_Habitat_template_v2021.0.gpkg</global.templateGPKG>
+	<dirwatch_path>$(SecureVertiGISShare)/NDVH/FME-Triggers/DOWNLOAD_HABITAT/</dirwatch_path>
+	<geopkg_file_location>$(vertigis)/NDVH/FileCache/Generated/</geopkg_file_location>
+	<fme_ndvhgeowebshare_document_public>$(vertigis)/NDVH/Documents/Public/</fme_ndvhgeowebshare_document_public>
+	<admin_email_messenger>kalagala.naveen@atos.net,ndvh@bij12.nl,minal.pachade@atos.net,prashanth.2.k@atos.net</admin_email_messenger>
+	<admin_email_reportFailure>kalagala.naveen@atos.net,ndvh@bij12.nl,minal.pachade@atos.net,prashanth.2.k@atos.net</admin_email_reportFailure>
+	<fme_ndvhgeowebshare_filecache_generated>$(vertigis)/NDVH/FileCache/Generated/</fme_ndvhgeowebshare_filecache_generated>
+	<file_location>$(vertigis)/NDVH/FileCache/Generated/</file_location>
+	<remove_temp_folder>No</remove_temp_folder>
+</parameters>

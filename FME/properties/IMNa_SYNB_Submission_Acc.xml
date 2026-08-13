@@ -1,0 +1,10 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<dirwatch_path>$(SecureVertiGISShare)/NDVH/FME-Triggers/Submit_SYNB/</dirwatch_path>
+	<synbiosysUrl>https://www.synbiosys.alterra.nl/turboveg/.net/GetCVDUris.aspx?table=syntaxa</synbiosysUrl>
+	<admin_email_messenger>ndvh@bij12.nl</admin_email_messenger>
+	<admin_email_reportFailure> leon.arts@atos.net, ndvh@bij12.nl, kalagala.naveen@atos.net,minal.pachade@atos.net,prashanth.2.k@atos.net</admin_email_reportFailure>
+	<remove_temp_folder>Yes</remove_temp_folder>
+	<environment_name>Acceptatie</environment_name>
+	<trigger_folder>$(SecureVertiGISShare)/NDVH/FME-Triggers/Submit_SYNB/</trigger_folder>
+</parameters>

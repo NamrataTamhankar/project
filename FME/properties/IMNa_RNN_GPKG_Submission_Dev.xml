@@ -1,0 +1,18 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<global_templateExcel>$(FME_SHAREDRESOURCE_DATA)/SNL/Validation Report Template/Validatie_rapport_template_v17.xlsx</global_templateExcel>
+	<global_templateGpkg>$(FME_SHAREDRESOURCE_DATA)/RNN/GeopackageTemplate/RNN_Import_template_v2026_11.gpkg</global_templateGpkg>
+	<global_templateFgdb>$(FME_SHAREDRESOURCE_DATA)/RNN/FGDBTemplates/RNN_Import_template_v2026_1.gdb/</global_templateFgdb>
+	<global_exporttemplateGpkg>$(FME_SHAREDRESOURCE_DATA)/RNN/GeopackageTemplate/RNN_Export_Template_v2026_19.gpkg</global_exporttemplateGpkg>
+	<global_exporttemplateFgdb>$(FME_SHAREDRESOURCE_DATA)/RNN/FGDBTemplates/RNN_Export_Template_v2026_3.gdb/</global_exporttemplateFgdb>
+	<dirwatch_path>$(SecureVertiGISShare)/RNN/FME-Triggers/INDIENEN_RNN/</dirwatch_path>
+	<etl_run_type>submit_rnn</etl_run_type>
+	<database_ip>172.16.2.19</database_ip>
+	<psql_path>D:\Program Files\PostgreSQL\17</psql_path>
+	<db_username>anlb</db_username>
+	<database_name>anlb</database_name>
+	<attachments_location>$(SecureVertiGISShare)/RNN/Attachments/</attachments_location>
+	<admin_email>nirmala.gundu@atos.net,athulya-b.unni@atos.net</admin_email>	
+	<droptmpfolder>No</droptmpfolder>
+	<Maatlat_Versie>Maatlatten-versie-mei-2025</Maatlat_Versie>
+</parameters>

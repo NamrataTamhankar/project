@@ -1,0 +1,14 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<global_program>NBP</global_program>
+	<global_provinceBordersTollerance>0.001</global_provinceBordersTollerance>
+	<global_templateExcel>$(FME_SHAREDRESOURCE_DATA)/SNL/Validation Report Template/Validatie_rapport_template_v17.xlsx</global_templateExcel>
+	<global_templateFGDB>$(FME_SHAREDRESOURCE_DATA)/SNL/FGDBTemplates/NBP_template_v2026.1.2.zip</global_templateFGDB>
+	<dirwatch_path>$(SecureVertiGISShare)/SNL/FME-Triggers/VALIDEER_NBP/</dirwatch_path>
+	<templateFGDB>$(FME_SHAREDRESOURCE_DATA)/SNL/FGDBTemplates/NBP_template_v2026.1.2.gdb/</templateFGDB>
+	<subsidieJaar>2027</subsidieJaar>
+	<geowebArchiveLocation>$(SecureVertiGISShare)/SNL/NBP_Attachments/</geowebArchiveLocation>
+	<admin_email_messenger>minal.pachade@atos.net, apoorva.jadhav@atos.net,kalagala.naveen@atos.net,nirmala.gundu@atos.net,athulya-b.unni@atos.net,pulluru.poornachandra@atos.net</admin_email_messenger>
+	<admin_email_reportFailure>minal.pachade@atos.net, apoorva.jadhav@atos.net,kalagala.naveen@atos.net,nirmala.gundu@atos.net,athulya-b.unni@atos.net,pulluru.poornachandra@atos.net</admin_email_reportFailure>
+	<remove_the_temp_folder>No</remove_the_temp_folder>
+</parameters>

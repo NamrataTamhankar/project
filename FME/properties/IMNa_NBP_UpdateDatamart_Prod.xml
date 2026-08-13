@@ -1,0 +1,11 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<global_templateGPKG>$(FME_SHAREDRESOURCE_DATA)/SNL/GPKG Templates/NBP_template_v2024.2.gpkg</global_templateGPKG>
+	<dirwatch_path>$(SecureVertiGISShare)/SNL/FME-Triggers/UPDATE_DATAMART_NBP/</dirwatch_path>
+	<nbp_attachement_folder>$(vertigis)/SNL/NBP_Attachements/</nbp_attachement_folder>
+	<nbp_secure_attachement_folder>$(SecureVertiGISShare)/SNL/NBP_Attachments/</nbp_secure_attachement_folder>
+	<geopkg_file_location>$(vertigis)/SNL/NBP_GeoPackages/</geopkg_file_location>
+	<admin_email_messenger>natuurbeheer@bij12.nl</admin_email_messenger>
+	<admin_email_reportFailure>natuurbeheer@bij12.nl,leon.arts@atos.net,arun.patkar@atos.net,kalagala.naveen@atos.net</admin_email_reportFailure>
+	<remove_temp_folder>Yes</remove_temp_folder>
+</parameters>

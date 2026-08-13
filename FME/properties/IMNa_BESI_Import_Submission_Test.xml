@@ -1,0 +1,8 @@
+<parameters>
+	<dirwatch_path>$(SecureVertiGISShare)/BESI/FME-Triggers/INDIENEN_IMPORT/</dirwatch_path>
+	<smtphost>172.16.0.11</smtphost>
+	<environment_name>Test</environment_name>
+	<admin_email>namrata.tamhankar@atos.net, prernavilas.ghodke@atos.net</admin_email>
+	<admin_email_report_failure>namrata.tamhankar@atos.net, prernavilas.ghodke@atos.net</admin_email_report_failure>
+	<droptmpfolder>No</droptmpfolder>
+</parameters>

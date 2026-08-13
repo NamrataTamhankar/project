@@ -1,0 +1,14 @@
+<parameters>
+	<dirwatch_path>$(SECURE_GEOWEB_SHARE)/IKN/FME-Triggers/VALIDEER_IKN/</dirwatch_path>
+	<global.templateFGDB>$(FME_SHAREDRESOURCE_DATA)/IKN/FGDBTemplates/IKN_template_v2025.1.zip</global.templateFGDB>
+	<global.provinceBordersTollerance>0.001</global.provinceBordersTollerance>
+	<global.program>IKN</global.program>
+	<global.bronType>FGDB</global.bronType>
+	<global.templateExcel>$(FME_SHAREDRESOURCE_DATA)/SNL/Validation Report Template/Validatie_rapport_template_v17.xlsx</global.templateExcel>
+	<dutch_border>$(FME_SHAREDRESOURCE_DATA)/IKN/FGDBTemplates/IKN_template_v2025.1.gdb/</dutch_border>
+	<drupal_archive>$(SECURE_GEOWEB_SHARE)/IKN/Attachments/</drupal_archive>
+	<admin_email>aishwarya@eviden.com,athulya-b.unni@eviden.com,presanna.nb@eviden.com</admin_email>
+	<smtphost>172.16.0.11</smtphost>
+	<admin_email_report_failure>aishwarya@eviden.com,athulya-b.unni@eviden.com,presanna.nb@eviden.com</admin_email_report_failure>
+	<droptmpfolder>No</droptmpfolder>
+</parameters>

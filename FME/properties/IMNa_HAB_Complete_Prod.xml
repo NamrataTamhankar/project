@@ -1,0 +1,12 @@
+<parameters>
+	<smtphost>172.16.0.11</smtphost>
+	<global_templateGPKG>$(FME_SHAREDRESOURCE_DATA)/NDVH/GPKG Template/NDVH_Habitat_template_v2021.0.gpkg</global_templateGPKG>
+	<dirwatch_path>$(SecureVertiGISShare)/NDVH/FME-Triggers/COMPLETE_HAB/</dirwatch_path>
+	<geopkg_file_location>$(vertigis)/NDVH/FileCache/Public/</geopkg_file_location>
+	<public_document_location>$(vertigis)/NDVH/Documents/Public/</public_document_location>
+	<trigger_folder_location>$(SecureVertiGISShare)/NDVH/FME-Triggers/COMPLETE_HAB/</trigger_folder_location>
+	<environment_name>Productie</environment_name>
+	<admin_email_messenger>ndvh@bij12.nl</admin_email_messenger>
+	<admin_email_failure>ndvh@bij12.nl</admin_email_failure>
+	<remove_temp_folder>Yes</remove_temp_folder>
+</parameters>

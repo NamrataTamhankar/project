@@ -1,0 +1,13 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<global_program>BES</global_program>
+	<global_provinceBordersTollerance>0.001</global_provinceBordersTollerance>
+	<global_templateExcel>$(FME_SHAREDRESOURCE_DATA)/SNL/Validation Report Template/Validatie_rapport_template_v17.xlsx</global_templateExcel>
+	<global_templateFGDB>$(FME_SHAREDRESOURCE_DATA)/BES/FGDBTemplates/Beschikkingen_template_v2026.1.zip</global_templateFGDB>
+	<dirwatch_path>$(SecureVertiGISShare)/SNL/FME-Triggers/VALIDEER_BES/</dirwatch_path>
+	<templateFGDB>$(FME_SHAREDRESOURCE_DATA)/BES/FGDBTemplates/Beschikkingen_template_v2026.1.gdb/</templateFGDB>
+	<geowebArchiveLocation>$(SecureVertiGISShare)/SNL/BES_Attachments/</geowebArchiveLocation>
+	<admin_email_messenger>natuurbeheer@bij12.nl</admin_email_messenger>
+	<admin_email_reportFailure>natuurbeheer@bij12.nl,gbo_ipo_application_management.it-solutions@atos.net</admin_email_reportFailure>
+	<remove_the_temp_folder>Yes</remove_the_temp_folder>
+</parameters>

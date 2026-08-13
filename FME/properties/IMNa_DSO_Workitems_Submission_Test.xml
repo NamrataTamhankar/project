@@ -1,0 +1,14 @@
+<parameters>
+    <trigger_folder>$(SecureVertiGISShare)/DSO/FME-Triggers/INDIENEN_DSO/</trigger_folder>
+	<smtphost>172.16.0.11</smtphost>
+	<dirwatch_path>$(SecureVertiGISShare)/DSO/FME-Triggers/INDIENEN_DSO/</dirwatch_path>
+	<global.dso_version>V2</global.dso_version>
+	<dso-url>https://service.omgevingswet.overheid.nl/publiek/toepasbare-regels/api/rtrgegevens/v2/</dso-url>
+	<x-api-key>ed496c4e-19f7-41fe-b5e8-66418eaf1f9a</x-api-key>
+	<admin_email_schema_transformer>prernavilas.ghodke@atos.net, namrata.tamhankar@atos.net</admin_email_schema_transformer>
+	<admin_email>prernavilas.ghodke@atos.net, namrata.tamhankar@atos.net</admin_email>
+	<environment>https://fme-test.gbo-provincies.nl</environment>
+	<admin_email_report_failure>prernavilas.ghodke@atos.net, namrata.tamhankar@atos.net</admin_email_report_failure>
+	<droptmpfolder>No</droptmpfolder>
+	<environment_name>Test</environment_name>
+</parameters>

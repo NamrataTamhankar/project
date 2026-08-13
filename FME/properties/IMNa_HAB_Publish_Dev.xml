@@ -1,0 +1,15 @@
+<parameters>
+	<smtphost>172.16.0.11</smtphost>
+	<global_templateGPKG>$(FME_SHAREDRESOURCE_DATA)/NDVH/GPKG Template/NDVH_Habitat_template_v2021.0.gpkg</global_templateGPKG>
+	<dirwatch_path>$(SecureVertiGISShare)/NDVH/FME-Triggers/UPDATE_PUBLISHED_HAB/</dirwatch_path>
+	<geopkg_file_location>$(vertigis)/NDVH/FileCache/Public/</geopkg_file_location>
+	<public_document_location>$(vertigis)/NDVH/Documents/Public/</public_document_location>
+	<all_cache_file_location>$(SecureVertiGISShare)/NDVH/FileCache/All/</all_cache_file_location>
+	<public_cache_file_location>$(vertigis)/NDVH/FileCache/Public/</public_cache_file_location>
+	<database_ip>172.16.2.19</database_ip>
+	<db_username>anlb</db_username>
+	<database_name>anlb</database_name>
+	<psql_path>D:\Program Files\PostgreSQL\17</psql_path>
+	<admin_email>minal.pachade@atos.net,prashanth.2.k@atos.net,kalagala.naveen@atos.net</admin_email>
+	<remove_temp_folder>No</remove_temp_folder>
+</parameters>

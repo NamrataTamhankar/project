@@ -1,0 +1,10 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<global_templateRVO>$(FME_SHAREDRESOURCE_DATA)/BES/FGDBTemplates/TemplateForRVO/Beschikkingen_RVO_template_v2026.1.gdb</global_templateRVO>
+	<dirwatch_path>$(SecureVertiGISShare)/SNL/FME-Triggers/RVO_BES/</dirwatch_path>
+	<outputFile>$(SecureVertiGISShare)/SNL/BES_RVO_File/</outputFile>
+	<fileLocation>$(SecureVertiGISShare)/SNL/BES_RVO_File/</fileLocation>
+	<admin_email_messenger>minal.pachade@atos.net,kalagala.naveen@atos.net</admin_email_messenger>
+	<admin_email_reportFailure>minal.pachade@atos.net,kalagala.naveen@atos.net</admin_email_reportFailure>
+	<remove_temp_folder>Yes</remove_temp_folder>
+</parameters>

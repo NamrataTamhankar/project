@@ -1,0 +1,9 @@
+<parameters>
+	<trigger_folder>$(SecureVertiGISShare)/IKN/FME-Triggers/INDIENEN_IKN_End_KOPPELVLAK/</trigger_folder>
+	<dirwatch_path>$(SecureVertiGISShare)/IKN/FME-Triggers/INDIENEN_IKN_End_KOPPELVLAK/</dirwatch_path>
+	<smtphost>172.16.0.11</smtphost>
+	<admin_email> namrata.tamhankar@atos.net</admin_email>
+	<admin_email_report_failure>namrata.tamhankar@atos.net</admin_email_report_failure>
+	<droptmpfolder>No</droptmpfolder>
+	<environment_name>Ontwikkeling</environment_name>
+</parameters>

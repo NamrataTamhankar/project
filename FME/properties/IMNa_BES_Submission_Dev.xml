@@ -1,0 +1,18 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<global_program>BES</global_program>
+	<global_provinceBordersTollerance>0.001</global_provinceBordersTollerance>
+	<global_templateExcel>$(FME_SHAREDRESOURCE_DATA)/SNL/Validation Report Template/Validatie_rapport_template_v17.xlsx</global_templateExcel>
+	<global_templateFGDB> $(FME_SHAREDRESOURCE_DATA)/BES/FGDBTemplates/Beschikkingen_template_v2026.1.zip</global_templateFGDB>
+	<dirwatch_path>$(SecureVertiGISShare)/SNL/FME-Triggers/INDIENEN_BES/</dirwatch_path>
+	<templateFGDB>$(FME_SHAREDRESOURCE_DATA)/BES/FGDBTemplates/Beschikkingen_template_v2026.1.gdb/</templateFGDB>
+	<database_ip>172.16.2.19</database_ip>
+	<psql_path>D:\Program Files\PostgreSQL\17</psql_path>
+	<db_username>anlb</db_username>
+	<database_name>anlb</database_name>
+	<xlsx_template>$(FME_SHAREDRESOURCE_DATA)/BES/XLSXTemplates/rapportage_ingediende_beheertypen.xlsx</xlsx_template>
+	<remove_the_temp_folder>No</remove_the_temp_folder>
+	<geowebArchiveLocation>$(SecureVertiGISShare)/SNL/BES_Attachments/</geowebArchiveLocation>
+	<admin_email_messenger>minal.pachade@atos.net,kalagala.naveen@atos.net</admin_email_messenger>
+	<admin_email_reportFailure>minal.pachade@atos.net,kalagala.naveen@atos.net</admin_email_reportFailure>
+</parameters>

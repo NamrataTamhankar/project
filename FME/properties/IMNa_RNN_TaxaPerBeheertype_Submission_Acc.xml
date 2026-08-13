@@ -1,0 +1,9 @@
+<parameters>
+	<smtphost>172.16.0.11</smtphost>
+	<dirwatch_path>$(SecureVertiGISShare)/RNN/FME-Triggers/INDIENEN_RNN_TAXA/</dirwatch_path>
+	<etl_run_type>submit_taxaPerBeheertype</etl_run_type>
+	<trigger_folder_location>$(SecureVertiGISShare)/RNN/FME-Triggers/INDIENEN_RNN_TAXA/</trigger_folder_location>
+	<source_file>$(FME_SHAREDRESOURCE_DATA)/RNN/TaxaPerBeheerType/WW-BIJLAGE-02-–-Kwalificerende-soorten-per-beheertype-–-aangevuld-met-naam en soortgroep_v4.xlsx</source_file>
+	<admin_email>rnn@bij12.nl,nirmala.gundu@atos.net,athulya-b.unni@atos.net,rick.smolders@eviden.com</admin_email>
+	<droptmpfolder>No</droptmpfolder>
+</parameters>

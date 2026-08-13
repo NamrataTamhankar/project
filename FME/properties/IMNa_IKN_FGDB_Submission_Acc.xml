@@ -1,0 +1,15 @@
+<parameters>
+	<dirwatch_path>$(SECURE_GEOWEB_SHARE)/IKN/FME-Triggers/INDIENEN_IKN/</dirwatch_path>
+	<global.templateFGDB>$(FME_SHAREDRESOURCE_DATA)/IKN/FGDBTemplates/IKN_template_v2024.1.zip</global.templateFGDB>
+	<global.provinceBordersTollerance>0.001</global.provinceBordersTollerance>
+	<global.program>IKN</global.program>
+	<global.bronType>FGDB</global.bronType>
+	<global.templateExcel>$(FME_SHAREDRESOURCE_DATA)/SNL/Validation Report Template/Validatie_rapport_template_v17.xlsx</global.templateExcel>
+	<dutch_border>$(FME_SHAREDRESOURCE_DATA)/IKN/FGDBTemplates/IKN_template_v2024.1.gdb/</dutch_border>
+	<metadata_folder>$(IknGeoWebShare)/Metadata/</metadata_folder>
+	<drupal_archive>$(SECURE_GEOWEB_SHARE)/IKN/Attachments/</drupal_archive>
+	<admin_email>informatiekaartnatuur@bij12.nl,aishwarya@eviden.com,athulya-b.unni@eviden.com,presanna.nb@eviden.com</admin_email>
+	<smtphost>172.16.0.11</smtphost>
+	<admin_email_report_failure>informatiekaartnatuur@bij12.nl,aishwarya@eviden.com,athulya-b.unni@eviden.com,presanna.nb@eviden.com</admin_email_report_failure>
+	<droptmpfolder>No</droptmpfolder>
+</parameters>

@@ -1,0 +1,17 @@
+<parameters>
+	<smtp_host>172.16.0.11</smtp_host>
+	<global_beheerplannenxslx>$(FME_SHAREDRESOURCE_DATA)/Naturaa2000/Sourcefiles/Natura2000-Beheerplannen.xlsx</global_beheerplannenxslx>
+	<global_wfssource>https://service.pdok.nl/rvo/natura2000/wfs/v1_0?request=getcapabilities&amp;service=wfs</global_wfssource>
+	<global_xmlsource>https://www.natura2000.nl/xml/gebieden</global_xmlsource>
+	<global_xslxsource>$(FME_SHAREDRESOURCE_DATA)/Naturaa2000/Sourcefiles/habitattypen_leefgebieden.xlsx</global_xslxsource>
+	<dirwatch_path>$(SecureVertiGISShare)/NDVH/FME-Triggers/Submit_N2000/</dirwatch_path>
+	<error_email_address>kalagala.naveen@atos.net,minal.pachade@atos.net,prashanth.2.k@atos.net</error_email_address>
+	<source_xml_url>https://www.natura2000.nl/xml/gebieden</source_xml_url>
+	<trigger_folder_location>$(SecureVertiGISShare)/IKN/FME-Triggers/INDIENEN_IKN_N2K/</trigger_folder_location>
+	<admin_email_messenger>kalagala.naveen@atos.net,minal.pachade@atos.net,prashanth.2.k@atos.net</admin_email_messenger>
+	<admin_email_reportFailure>kalagala.naveen@atos.net,minal.pachade@atos.net,prashanth.2.k@atos.net</admin_email_reportFailure>
+	<remove_temp_folder>Yes</remove_temp_folder>
+	<n2000_fgdb_file>$(FME_SHAREDRESOURCE_DATA)/NDVH/N2000 FGDB Template/</n2000_fgdb_file>
+	<environment_name>Test</environment_name>
+	<trigger_folder>$(SecureVertiGISShare)/NDVH/FME-Triggers/Submit_N2000/</trigger_folder>
+</parameters>

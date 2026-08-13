@@ -1,0 +1,12 @@
+<parameters>
+	<dirwatch_path>$(SecureVertiGISShare)/BESI/FME-Triggers/INDIENEN_EXPORT/</dirwatch_path>
+	<global.accessdbtemplate>$(FME_SHAREDRESOURCE_DATA)/BESI/MS Access DB templates/BESI Domeinen v14.accdb</global.accessdbtemplate>
+	<smtphost>172.16.0.11</smtphost>
+	<environment>prod</environment>
+	<environment_name> </environment_name>
+	<drupal_archive>$(SecureVertiGISShare)/BESI/Attachments/</drupal_archive>
+	<admin_email>beschermdesoortenindicator@bij12.nl</admin_email>
+	<admin_email_report_failure>beschermdesoortenindicator@bij12.nl</admin_email_report_failure>
+	<droptmpfolder>Yes</droptmpfolder>
+</parameters>
+

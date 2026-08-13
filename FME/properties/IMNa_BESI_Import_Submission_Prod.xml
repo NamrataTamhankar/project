@@ -1,0 +1,8 @@
+<parameters>
+	<dirwatch_path>$(SecureVertiGISShare)/BESI/FME-Triggers/INDIENEN_IMPORT/</dirwatch_path>
+	<smtphost>172.16.0.11</smtphost>
+	<environment_name> </environment_name>
+	<admin_email>beschermdesoortenindicator@bij12.nl</admin_email>
+	<admin_email_report_failure>beschermdesoortenindicator@bij12.nl</admin_email_report_failure>
+	<droptmpfolder>Yes</droptmpfolder>
+</parameters>
