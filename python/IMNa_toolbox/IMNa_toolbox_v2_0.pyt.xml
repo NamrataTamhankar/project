@@ -1,0 +1,26 @@
+<metadata xml:lang="en">
+<Esri>
+<CreaDate>20250912</CreaDate>
+<CreaTime>10553800</CreaTime>
+<ArcGISFormat>1.0</ArcGISFormat>
+<SyncOnce>TRUE</SyncOnce>
+<ModDate>20250912</ModDate>
+<ModTime>105538</ModTime>
+</Esri>
+<toolbox name="IMNa_toolbox_v2_0" alias="">
+<arcToolboxHelpPath>c:\users\a882121\appdata\local\programs\arcgis\pro\Resources\Help\gp</arcToolboxHelpPath>
+<toolsets/>
+</toolbox>
+<dataIdInfo>
+<idCitation>
+<resTitle>IMNa_toolbox_v2_0</resTitle>
+</idCitation>
+</dataIdInfo>
+<distInfo>
+<distributor>
+<distorFormat>
+<formatName>ArcToolbox Toolbox</formatName>
+</distorFormat>
+</distributor>
+</distInfo>
+</metadata>
