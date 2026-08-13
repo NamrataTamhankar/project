@@ -1,0 +1,3 @@
+UPDATE besi.besi_taxa SET valid_to = null WHERE taxa_id = (SELECT id from ndff.taxa WHERE identity = 'http://ndff-ecogrid.nl/taxonomy/taxa/meropsapiaster');
+UPDATE besi.besi_taxa SET valid_to = null WHERE taxa_id = (SELECT id from ndff.taxa WHERE identity = 'http://ndff-ecogrid.nl/taxonomy/taxa/cucujuscinnaberinus');
+UPDATE besi.besi_taxa SET valid_to = null WHERE taxa_id = (SELECT id from ndff.taxa WHERE identity = 'http://ndff-ecogrid.nl/taxonomy/taxa/martesmartes');
