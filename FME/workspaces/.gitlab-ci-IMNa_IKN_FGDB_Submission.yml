@@ -1,0 +1,68 @@
+stages:           # List of stages for jobs, and their order of execution
+  - build
+
+build-test-ikn-fgdb-submission:        # This job runs in the build stage, which runs first.
+  stage: build
+
+  cache: null
+
+  script:
+    - echo "BEGIN - Deploying the code for test..."
+    - if (Test-Path $IMNa_PATH\FME) { Remove-Item $IMNa_PATH\FME -Force -Recurse }
+    - cp -R FME $IMNa_PATH\FME
+    - Invoke-Command -ScriptBlock { D:\GitLab-Deployments\IMNa\FME\scripts\IMNa_IKN_FGDB_Submission.ps1 D:\GitLab-Deployments\IMNa\FME\properties\test.properties $FME_TOKEN_TEST}
+    - echo "END - Deployment complete."
+
+  environment:
+    name: test
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - FME/projects/IMNa_IKN_FGDB_Submission.fsproject
+        - FME/properties/IMNa_IKN_FGDB_Submission.xml
+        - FME/scripts/IMNa_IKN_FGDB_Submission.ps1
+        - FME/xslts/IMNa_IKN_FGDB_Submission.xslt
+        - FME/workspaces/IMNa_IKN/*
+        - FME/workspaces/.gitlab-ci-IMNa_IKN_FGDB_Submission.yml
+      when: manual
+
+build-accp-ikn-fgdb-submission:        # This job runs in the build stage, which runs first.
+  stage: build
+
+  cache: null
+
+  script:
+    - echo "BEGIN - Deploying the code for acc..."
+    - if (Test-Path $IMNa_PATH\FME) { Remove-Item $IMNa_PATH\FME -Force -Recurse }
+    - cp -R FME $IMNa_PATH\FME
+    - Invoke-Command -ScriptBlock { D:\GitLab-Deployments\IMNa\FME\scripts\IMNa_IKN_FGDB_Submission.ps1 D:\GitLab-Deployments\IMNa\FME\properties\acc.properties $FME_TOKEN_ACC}
+    - echo "END - Deployment complete."
+
+  environment:
+    name: acceptance
+    
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+-IKN$/'
+      when: manual
+
+
+build-prod-ikn-fgdb-submission:        # This job runs in the build stage, which runs first.
+  stage: build
+
+  cache: null
+
+  script:
+    - echo "BEGIN - Deploying the code for prod..."
+    - if (Test-Path $IMNa_PATH\FME) { Remove-Item $IMNa_PATH\FME -Force -Recurse }
+    - cp -R FME $IMNa_PATH\FME
+    - Invoke-Command -ScriptBlock { D:\GitLab-Deployments\IMNa\FME\scripts\IMNa_IKN_FGDB_Submission.ps1
+     D:\GitLab-Deployments\IMNa\FME\properties\prod.properties $FME_TOKEN_PROD}
+    - echo "END - Deployment complete."
+
+  environment:
+    name: production
+    
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+.\d+.\d+-IKN$/'
+      when: manual
