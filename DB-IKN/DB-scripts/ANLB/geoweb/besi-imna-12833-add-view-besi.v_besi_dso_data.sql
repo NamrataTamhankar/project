@@ -1,0 +1,184 @@
+-- View: besi.v_besi_dso_data
+
+-- DROP VIEW besi.v_besi_dso_data;
+
+--CREATE OR REPLACE VIEW geoweb.v_besi_dso_data
+-- AS
+--  SELECT request_id, COALESCE(bool_or(CAST(Zoogdieren AS boolean)), false) AS Zoogdieren, COALESCE(bool_or(CAST(Vogels AS boolean)), false) AS Vogels,
+--  COALESCE(bool_or(CAST("Andere diersoort dan vogels of zoogdieren" AS boolean)), false) AS "Andere diersoort dan vogels of zoogdieren", COALESCE(bool_or(CAST(Planten AS boolean)), false) AS Planten, 
+--  COALESCE(bool_or(CAST(Jaarrond AS boolean)), false) AS Jaarrond, COALESCE(bool_or(CAST(Broedseizoen AS boolean)), false) AS Broedseizoen,
+--  COALESCE(bool_or(CAST(Vleermuizen AS boolean)), false) AS Vleermuizen, COALESCE(bool_or(CAST(Eekhoorn AS boolean)), false) AS Eekhoorn, COALESCE(bool_or(CAST(Steenmarter AS boolean)), false) AS Steenmarter,
+--  COALESCE(bool_or(CAST("Andere marterachtige dan steenmarter" AS boolean)), false) AS "Andere marterachtige dan steenmarter", COALESCE(bool_or(CAST("Overige zoogdieren" AS boolean)), false) AS "Overige zoogdieren"
+--  FROM(
+--	 SELECT 
+--		DISTINCT r.id AS request_id, 
+--		----------------------- Zoogdieren ----------------------
+--		CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_animal_group ag ON ag.id = st1.animal_group_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(ag.code::text) = 'zd'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS zoogdieren,
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_animal_group ag ON ag.id = st1.animal_group_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(ag.code::text) = 'vo'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS vogels,
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_animal_group ag ON ag.id = st1.animal_group_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(ag.code::text) = 'ad'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS "Andere diersoort dan vogels of zoogdieren",
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_animal_group ag ON ag.id = st1.animal_group_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(ag.code::text) = 'pl'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS planten,
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_protected_nest pn ON pn.id = st1.protected_nest_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(pn.code::text) = 'jr'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS jaarrond,
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_protected_nest pn ON pn.id = st1.protected_nest_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(pn.code::text) = 'bs'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS broedseizoen,
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(mt.code::text) = 'vm'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS vleermuizen,
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(mt.code::text) = 'eh'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS eekhoorn,
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(mt.code::text) = 'sm'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS steenmarter,
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(mt.code::text) = 'am'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS "Andere marterachtige dan steenmarter",
+--                CASE
+--                    WHEN (( SELECT count(st1.taxa_id) AS count
+--                       FROM besi.besi_taxa st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.taxa_id = s.taxa_id AND lower(mt.code::text) = 'oz'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS "Overige zoogdieren"
+--           FROM geoweb.besi_report_request r
+--             JOIN besi.v_gw_besi_star s ON (s.grid_id = ANY (r.grid_ids)) AND s.werkzaamheid_id = r.werkzaamheid_id
+--        UNION
+--         SELECT DISTINCT r.id AS request_id,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_animal_group ag ON ag.id = st1.animal_group_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(ag.code::text) = 'zd'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS zoogdieren,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_animal_group ag ON ag.id = st1.animal_group_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(ag.code::text) = 'vo'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS vogels,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_animal_group ag ON ag.id = st1.animal_group_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(ag.code::text) = 'ad'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS "Andere diersoort dan vogels of zoogdieren",
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_animal_group ag ON ag.id = st1.animal_group_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(ag.code::text) = 'pl'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS planten,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_protected_nest pn ON pn.id = st1.protected_nest_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(pn.code::text) = 'jr'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS jaarrond,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_protected_nest pn ON pn.id = st1.protected_nest_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(pn.code::text) = 'bs'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS broedseizoen,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(mt.code::text) = 'vm'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS vleermuizen,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(mt.code::text) = 'eh'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS eekhoorn,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(mt.code::text) = 'sm'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS steenmarter,
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(mt.code::text) = 'am'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS "Andere marterachtige dan steenmarter",
+--                CASE
+--                    WHEN (( SELECT count(st1.id) AS count
+--                       FROM besi.besi_species_group st1
+--                         LEFT JOIN masterdata.dmn_mammal_type mt ON mt.id = st1.mammal_type_id
+--                      WHERE st1.id = s.besi_species_group_id AND lower(mt.code::text) = 'oz'::text)) > 0 THEN 'true'::text
+--                    ELSE 'false'::text
+--                END AS "Overige zoogdieren"
+--           FROM geoweb.besi_report_request r
+--	JOIN besi.v_gw_besi_star_besi_species_group s ON s.grid_id = ANY (r.grid_ids) AND s.werkzaamheid_id = r.werkzaamheid_id
+--	 ) AS foo
+--  GROUP BY request_id;
+-- 
+--ALTER TABLE geoweb.v_besi_dso_data
+--    OWNER TO anlb;
+--
+--GRANT SELECT ON TABLE geoweb.v_besi_dso_data TO besi_readonly;
+--GRANT SELECT ON geoweb.v_besi_dso_data TO besi_geoweb;
+--GRANT SELECT ON geoweb.v_besi_dso_data TO anlb_sqlpad;

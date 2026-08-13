@@ -1,0 +1,129 @@
+--DROP VIEW IF EXISTS geoweb.v_besi_beschermde_factor;
+--CREATE OR REPLACE VIEW geoweb.v_besi_beschermde_factor
+-- AS
+-- SELECT DISTINCT r.id AS request_id,
+--    nt.name,
+--    nt.scientific AS scientific_name,
+--    df.description AS beschermende_factor_description,
+--    df.code AS beschermende_factor_code,
+--    k.versie AS kans_versie,
+--    k.datum AS kans_datum
+--   FROM geoweb.besi_report_request r
+--     JOIN besi.v_gw_besi_star s ON (s.grid_id = ANY (r.grid_ids)) AND s.werkzaamheid_id = r.werkzaamheid_id
+--     JOIN ndff.taxa nt ON nt.id = s.taxa_id
+--     JOIN besi.besi_taxa bt ON bt.taxa_id = s.taxa_id
+--     JOIN masterdata.dmn_beschermende_factor df ON df.id = bt.beschermende_factor_id
+--     JOIN besi.taxa_kans_versie k ON k.taxa_id = s.taxa_id
+--  WHERE NOT (EXISTS ( SELECT 1
+--           FROM besi.taxa_kans_versie kh
+--          WHERE kh.taxa_id = k.taxa_id AND kh.versie > k.versie))
+--UNION
+--SELECT DISTINCT r.id AS request_id,
+--    bt.name,
+--    bt.scientific AS scientific_name,
+--    df.description AS beschermende_factor_description,
+--    df.code AS beschermende_factor_code,
+--    k.versie AS kans_versie,
+--    k.datum AS kans_datum
+--   FROM geoweb.besi_report_request r
+--     JOIN besi.v_gw_besi_star_besi_species_group s ON (s.grid_id = ANY (r.grid_ids)) AND s.werkzaamheid_id = r.werkzaamheid_id
+--     JOIN besi.besi_species_group bt ON bt.id = s.besi_species_group_id
+--     JOIN masterdata.dmn_beschermende_factor df ON df.id = bt.beschermende_factor_id
+--     JOIN besi.besi_species_group_kans_versie k ON k.besi_species_group_id = s.besi_species_group_id
+--  WHERE NOT (EXISTS ( SELECT 1
+--           FROM besi.besi_species_group_kans_versie kh
+--          WHERE kh.besi_species_group_id = k.besi_species_group_id AND kh.versie > k.versie))
+--UNION
+--SELECT DISTINCT r.id AS request_id,
+--    nt.name,
+--    nt.scientific AS scientific_name,
+--    df.description AS beschermende_factor_description,
+--    df.code AS beschermende_factor_code,
+--	k.versie AS kans_versie,
+--    k.begin_geldigheid AS kans_datum
+--   FROM geoweb.besi_report_request r
+--     JOIN besi.v_gw_besi_star_regelink s ON s.geo_object_id =  ANY (r.object_ids) AND s.werkzaamheid_id = r.werkzaamheid_id
+--     JOIN ndff.taxa nt ON nt.id = s.taxa_id
+--     JOIN besi.besi_taxa bt ON bt.taxa_id = s.taxa_id
+--     JOIN masterdata.dmn_beschermende_factor df ON df.id = bt.beschermende_factor_id
+--	 JOIN besi.regelink_functie_kans_versie k ON k.eind_geldigheid IS null
+--	 JOIN masterdata.dmn_regelink_functie f ON f.id = s.regelink_functie_id
+--	 WHERE f.valid_to IS null;
+--	 
+--ALTER TABLE geoweb.v_besi_beschermde_factor
+--    OWNER TO anlb;
+--
+--COMMENT ON VIEW geoweb.v_besi_beschermde_factor
+--	IS 'This view is being used when creating the report in Besi. This view contains the information for beschermde factor in the generated report'
+--;
+--
+--
+--DROP VIEW IF EXISTS geoweb.v_besi_soorten_en_adviezen;
+--CREATE OR REPLACE VIEW geoweb.v_besi_soorten_en_adviezen
+-- AS
+-- SELECT DISTINCT r.id AS request_id,
+--    t.name,
+--    a.description,
+--    rt.beschrijving_habitat AS report_text_beschrijving_habitat,
+--    rt.gevoeligheid AS report_text_gevoeligheid,
+--    rt.advies AS report_text_advies,
+--	null as functie
+--   FROM geoweb.besi_report_request r
+--     JOIN besi.v_gw_besi_star s ON (s.grid_id = ANY (r.grid_ids)) AND s.werkzaamheid_id = r.werkzaamheid_id
+--     JOIN besi.taxa_rapport_text rt ON rt.taxa_id = s.taxa_id
+--     JOIN ndff.taxa t ON t.id = s.taxa_id
+--     JOIN besi.besi_taxa b ON b.taxa_id = s.taxa_id
+--     JOIN masterdata.dmn_animal_group a ON a.id = b.animal_group_id
+--UNION
+-- SELECT DISTINCT r.id AS request_id,
+--    t.name,
+--    a.description,
+--    rt.beschrijving_habitat AS report_text_beschrijving_habitat,
+--    rt.gevoeligheid AS report_text_gevoeligheid,
+--    rt.advies AS report_text_advies,
+--	null as functie
+--   FROM geoweb.besi_report_request r
+--     JOIN besi.v_gw_besi_star_besi_species_group s ON (s.grid_id = ANY (r.grid_ids)) AND s.werkzaamheid_id = r.werkzaamheid_id
+--     JOIN besi.besi_species_group_rapport_text rt ON rt.besi_species_group_id = s.besi_species_group_id
+--     JOIN besi.besi_species_group t ON t.id = s.besi_species_group_id
+--     JOIN masterdata.dmn_animal_group a ON a.id = t.animal_group_id
+--  UNION
+--  SELECT DISTINCT r.id AS request_id, 
+--                 t.name AS name,
+--                 a.description,
+--                 rt.beschrijving_habitat AS report_text_beschrijving_habitat, 
+--                 rt.gevoeligheid AS report_text_gevoeligheid, 
+--                 rt.advies AS report_text_advies,
+--                 string_agg (DISTINCT f.description, ', ') AS functie
+--  FROM geoweb.besi_report_request r
+--  JOIN besi.v_gw_besi_star_regelink s ON s.geo_object_id =  ANY (r.object_ids) AND s.werkzaamheid_id = r.werkzaamheid_id
+--  JOIN besi.taxa_rapport_text rt on (rt.taxa_id = s.taxa_id)
+--  JOIN ndff.taxa t ON (T.id = s.taxa_id)
+--  JOIN besi.besi_taxa b on (b.taxa_id = s.taxa_id)
+--  JOIN masterdata.dmn_animal_group a on (a.id = b.animal_group_id)
+--  JOIN masterdata.dmn_regelink_functie f on f.id = s.regelink_functie_id
+--  WHERE f.valid_to IS null
+--  GROUP BY r.id, t.name, a.description, rt.beschrijving_habitat, rt.gevoeligheid, rt.advies;
+--  
+--ALTER TABLE geoweb.v_besi_soorten_en_adviezen
+--    OWNER TO anlb;
+--	
+--COMMENT ON VIEW geoweb.v_besi_soorten_en_adviezen
+--	IS 'This view is being used when creating the report in Besi. This view contains the information for soorten en adviezen in the generated report'
+--;
+--
+--GRANT SELECT ON ALL TABLES IN SCHEMA geoweb TO anlb_sqlpad;
+--GRANT SELECT ON ALL TABLES IN SCHEMA geoweb TO besi_readonly;
+--
+--
+--/* IMNA-9871 Besi new database user account */
+--GRANT SELECT, INSERT ON geoweb.besi_report_request TO besi_geoweb;
+--
+--
+--GRANT SELECT ON geoweb.v_besi_report_header TO besi_geoweb;
+--GRANT SELECT ON geoweb.v_besi_soorten_en_adviezen TO besi_geoweb;
+--GRANT SELECT ON geoweb.v_besi_beschermde_factor TO besi_geoweb;
+--GRANT SELECT ON geoweb.v_besi_dso_data TO besi_geoweb;
+--
+--/* GRANT USAGE ON SCHEMA */
+--GRANT USAGE ON SCHEMA geoweb TO besi_geoweb;

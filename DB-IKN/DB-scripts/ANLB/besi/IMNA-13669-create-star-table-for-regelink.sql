@@ -1,0 +1,26 @@
+--CREATE OR REPLACE VIEW besi.v_gw_besi_star_regelink
+-- AS
+-- SELECT effect_werkzaamheid.werkzaamheid_id,
+--	besi_taxa.taxa_id,
+--	effect_regelink_functie.regelink_functie_id,
+--	taxa_regelink_functie_geo_object_kans.geo_object_id
+-- FROM besi.effect_werkzaamheid
+-- JOIN besi.effect_regelink_functie ON effect_werkzaamheid.effect_id = effect_regelink_functie.effect_id
+-- JOIN besi.taxa_regelink_functie_geo_object_kans ON taxa_regelink_functie_geo_object_kans.regelink_functie_id = effect_regelink_functie.regelink_functie_id
+-- JOIN besi.besi_taxa ON besi_taxa.taxa_id = taxa_regelink_functie_geo_object_kans.taxa_id
+--	WHERE (EXISTS ( SELECT 1
+--	FROM besi.besi_taxa
+--	WHERE besi_taxa.taxa_id = taxa_regelink_functie_geo_object_kans.taxa_id
+--	AND besi_taxa.valid_to IS NULL))
+--	AND (EXISTS ( SELECT 1
+--			FROM besi.taxa_rapport_text
+--			WHERE taxa_rapport_text.taxa_id = taxa_regelink_functie_geo_object_kans.taxa_id))
+--	AND ((besi_taxa.selectie_kans is NULL AND taxa_regelink_functie_geo_object_kans.kans > 0.75)
+--	OR (besi_taxa.selectie_kans is NOT NULL AND taxa_regelink_functie_geo_object_kans.kans > besi_taxa.selectie_kans));
+--
+--ALTER TABLE besi.v_gw_besi_star_regelink
+--	OWNER TO anlb;
+--	
+--GRANT SELECT ON ALL TABLES IN SCHEMA besi TO anlb_sqlpad;
+--
+--GRANT SELECT ON besi.geo_object TO besi_geoweb; 

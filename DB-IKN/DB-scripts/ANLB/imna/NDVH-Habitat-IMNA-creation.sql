@@ -1,0 +1,406 @@
+\echo "Starting deployment of NDVH masterdata IMNA-2422 - Habitat IMNA"
+
+/* GRANT USAGE ON SCHEMA */
+GRANT USAGE ON SCHEMA imna TO ndvh_geoweb;
+
+/* Create Tables */
+
+CREATE TABLE IF NOT EXISTS imna.habitat
+(
+	id bigint NOT NULL   DEFAULT NEXTVAL(('imna_seq'::text)::regclass),
+	package_id bigint NOT NULL,
+	identificatie char(100) NOT NULL,    -- IMNA: Attribuut:  habitatID Type: NEN3610ID Definitie :Unieke code van het habitatobject  Toelichting: NL.IMNa.bronhoudercode.lokaalid    Actual implementation is different Type: String(100) Description: Value will the id of the habitat from the user.
+	bron text NULL,    -- IMNA:  Definitie: Gebruikte   bronnen   waarmee   de   bepaling   van habitattypen   heeft plaatsgevonden.  Toelichting: Bijvoorbeeld packageID van vegetatiekartingpackage
+	veldsituatie_datum timestamp NOT NULL,    -- IMNA: Definitie: datum van de veldsituatie waarop de basisinformatie betrekking heeft 
+	geometrie geometry(polygon) NOT NULL,    -- Application FME Validations:  	1. Basic OGC validation 	2. No self intersect 	3. Must have single line or area 	4. No self overlap
+	opmerking text NULL    -- IMNA: Definitie: Dit veld geeft de mogelijkheid om een algemene opmerking horende bij alle habitttypen in een vlak op te nemen. Toelichting: Het veld 'opmerking' bij habitatTypeBedekking kan gebruikt worden om een specificatie van de onderbouwing voor ieder habitattype in een vlak apart te geven.
+)
+;
+ALTER TABLE imna.habitat
+    OWNER to anlb;
+
+CREATE TABLE IF NOT EXISTS imna.habitat_documentatie
+(
+	package_id bigint NOT NULL,
+	document_naam varchar(1024) NOT NULL,    -- Bestands naam
+	document_uri varchar(1024) NOT NULL,    -- Download URL naar het bestand
+	verantwoordings_document boolean NOT NULL,    -- Indicatie of dit bestand het verantwoordings document betreft
+	bron_bestand boolean NOT NULL    -- Indicatie of dit het Geometrische FGDB bestand betref
+)
+;
+ALTER TABLE imna.habitat_documentatie
+    OWNER to anlb;
+	
+CREATE TABLE IF NOT EXISTS imna.habitat_package
+(
+	id bigint NOT NULL   DEFAULT NEXTVAL(('imna_seq'::text)::regclass),
+	identificatie char(100) NOT NULL,    -- IMNA: Attribuut: packageID Type: NEN3610ID Definitie: Unieke code van de vegetatiepackage  Toelichting: Het packageID is als volgt opgebouwd: NL.IMNa.bronhoudercode.lokaalid. Lokaal ID kan conform methodiekdocument (o.a. nummer van gebied).  Multipliciteit:1  Actual implementation is different Type: String(100) Description: Value will automatically be calculated by setting it to gebiedNummer + packageType + packageVersie The field is not part of the upload and cannot be changed by the user.
+	begin_geldigheid timestamp NOT NULL,    -- IMNA Definitie: Start van de periode waarop deze instantie van het object geldig is in de werkelijkheid.   This field will be automatically calculated by the system.
+	eind_geldigheid timestamp NULL,    -- IMNA Definitie: eind van de periode waarop deze instantie van het object geldig is in de werkelijkheid. Wanneer deze waarde niet is ingevuld is de instantie nog geldig   This field will be automatically calculated by the system.
+	begin_tijd timestamp NOT NULL,    -- IMNA Definitie: Tijdstip waarop het object in de werkelijkheid is ontstaan.
+	eind_tijd timestamp NULL,    -- IMNA Definitie: Tijdstip waarop het object in de werkelijk niet meer geldig is.
+	gebied_id bigint NOT NULL,    -- IMNA: Definitie: Het nummer van het Natura 2000-gebied volgens het (ontwerp)besluit  Toelichting: Het nummer betreft de Nederlandse nummering, niet de Europese 
+	package_bronhouder_id bigint NOT NULL,    -- IMNA:  Definitie: Bronhouder van de habitatpackage  Toelichting: Bronhouders  zijn  eindverantwoordelijk  voor  de informatie  die  in  de habitatpackage is opgenomen  This is a reference to the domain DomainBronhouder. The values in this domain are obtained from LNV. So Bronhouder to us is equivalent to VoortouwNemer.
+	package_inwinner varchar(255) NOT NULL,    -- IMNA: Definitie: Inwinner van de informatie uit de habitatpackage  Toelichting: Bijvoorbeeld provincie die habitattypekaart heeft gemaakt. 
+	ingediend_door varchar(20) NOT NULL,    -- this will be the userId of the user who submitted the package
+	vast_gesteld boolean NOT NULL   DEFAULT false,    -- Indicated specifying if this is the official version that should be publicly available.  Note that only ONE package can have this set to true per  	1. gebiedsNummer 	2. packageType (Leefgebied of Habitat) 	3. packageVersion (T0, T1...)
+	vast_gesteld_door varchar(20) NULL,    -- UserId of the user who set the vasteGesteld attribute to true. If the the vasteGesteld attribute is set to false this field will be cleared.
+	vast_gesteld_op timestamp without time zone NULL,    -- Date and Time on which the vasteGesteld attribute is set to true. If the the vasteGesteld attribute is set to false this field will be cleared.
+	package_kwaliteit_id bigint NOT NULL,    -- IMNA: Attribuut: packageKwaliteit Type:  Kwaliteitslabel Definitie: Kwaliteit van de datapackage conform codelijst Kwaliteitslabel   The IPH group will store their generic findings of their review in this field. The values they can choose are denoted by the domain DomainPackageKwaliteit Per default the value will be N meaning no review has yet been done.
+	package_kwaliteit_door varchar(20) NULL,    -- UserId of the user who set the packageQuality attribute.
+	package_kwaliteit_op timestamp with time zone NULL,    -- Date and Time on which the packageQuality attribute is set.
+	package_naam varchar(100) NOT NULL,    -- IMNA:  Not in IMNA.  Name of the package as specified in the upload by the user.
+	package_toelichting text NULL,    -- IMNA: Attribuut: packageToelichting Definitie: Toelichtingvan de habitatpackage 
+	package_geometrie geometry(polygon) NULL,    -- Application FME Validations:  	1. Must have areas 	2. Basic OGC validation 	3. No self intersect
+	package_type_id bigint NOT NULL,    -- Denotes the type of data in the Package. The field is validated against a domain and can have currently only have the values: H = Habitat L = Leefgebied  Only H is in scope for the first release.
+	package_versie_id bigint NOT NULL,    -- A new version of package for a Habitat 2000 area is released every 12 years. The version is validated against a domain that has the values:  T0 - Initial version of Natura 2000 area creataion T1 - second version  etc.  For the first release on T0 is in scope.
+	package_volgnummer integer NOT NULL   DEFAULT 0,    -- Sequence number denoting the sub version / upload for a certain   	1. Natura 2000 area referenced by GebiedsNummber 	2. packageType (L or H) 	3. packageVersion (T0 / T1)   Multiple versions of can exist for the above combination, and uploads can continue until the IPH review group approves
+	methodiek_document_versie_id bigint NOT NULL    -- IMNA: Definitie:  Versienummer  van  het  gebruikte methodiekdocument  voor  habitattype kartering. Toelichting: In te vullen conform codelijst 'MethodiekDocumentVersie'
+)
+;
+ALTER TABLE imna.habitat_package
+    OWNER to anlb;
+
+CREATE TABLE IF NOT EXISTS imna.habitat_type_bedekking_t0
+(
+	habitat_id bigint NOT NULL,
+	habitat_type_id bigint NOT NULL,
+	kwaliteit_id bigint NOT NULL,
+	bedekkings_oppervlakte decimal(20,2) NOT NULL,
+	bedekkings_percentage integer NOT NULL,    -- Application FME Validations:  	1. bedekkingsPercentatge must be between 99% and 101% per Habitat
+	opmerking text NULL
+)
+;
+ALTER TABLE imna.habitat_type_bedekking_t0
+    OWNER to anlb;
+
+CREATE TABLE IF NOT EXISTS imna.habitat_type_bedekking_tx
+(
+	habitat_id bigint NOT NULL,
+	habitat_type_id bigint NOT NULL,
+	kwaliteit_id bigint NOT NULL,
+	bedekkings_oppervlakte decimal(20,2) NOT NULL,
+	bedekkings_percentage integer NOT NULL,    -- Application FME Validations:  	1. bedekkingsPercentatge must be between 99% and 101% per Habitat
+	opmerking text NULL
+)
+;
+ALTER TABLE imna.habitat_type_bedekking_tx
+    OWNER to anlb;
+
+/* Create Primary Keys, Indexes, Uniques, Checks */
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat','PK_habitat',
+'ALTER TABLE imna.habitat ADD CONSTRAINT PK_habitat
+	PRIMARY KEY (id)
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat','UN_habtitat_identificatie',
+'ALTER TABLE imna.habitat ADD CONSTRAINT UN_habtitat_identificatie UNIQUE (package_id,identificatie)
+;');
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_habitat_package ON imna.habitat (package_id ASC)
+;
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_documentatie','PK_habitatDocumentatie',
+'ALTER TABLE imna.habitat_documentatie ADD CONSTRAINT PK_habitatDocumentatie
+	PRIMARY KEY (package_id,document_naam)
+;');
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_documentatie_habitat_package ON imna.habitat_documentatie (package_id ASC)
+;
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','PK_habitat_package',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT PK_habitat_package
+	PRIMARY KEY (id)
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','UN_habitat_package_identifcatie',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT UN_habitat_package_identifcatie UNIQUE (identificatie,begin_geldigheid)
+;');
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_package_dmn_bronhouder ON imna.habitat_package (package_bronhouder_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_package_dmn_habitat_package_type ON imna.habitat_package (package_type_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_package_dmn_habitat_package_versie ON imna.habitat_package (package_versie_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_package_dmn_methodiek_document_versie ON imna.habitat_package (methodiek_document_versie_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_package_dmn_package_kwaliteit ON imna.habitat_package (package_kwaliteit_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_package_natura_2000 ON imna.habitat_package (gebied_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_package_natura_2000_gebied_voortouwnemer ON imna.habitat_package (gebied_id ASC,package_bronhouder_id ASC)
+;
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_type_bedekking_t0','PK_habitat_type_bedekking_t0',
+'ALTER TABLE imna.habitat_type_bedekking_t0 ADD CONSTRAINT PK_habitat_type_bedekking_t0
+	PRIMARY KEY (habitat_id,habitat_type_id,kwaliteit_id)
+;');
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_type_bedekking_t0_dmn_habitat_kwaliteit_t0 ON imna.habitat_type_bedekking_t0 (kwaliteit_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_type_bedekking_t0_dmn_habitat_type_to ON imna.habitat_type_bedekking_t0 (habitat_type_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_type_bedekking_t0_habitat ON imna.habitat_type_bedekking_t0 (habitat_id ASC)
+;
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_type_bedekking_tx','PK_habitat_type_bedekking_tx',
+'ALTER TABLE imna.habitat_type_bedekking_tx ADD CONSTRAINT PK_habitat_type_bedekking_tx
+	PRIMARY KEY (habitat_id,habitat_type_id,kwaliteit_id)
+;');
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_type_bedekking_tx_dmn_habitat_kwaliteit_tx ON imna.habitat_type_bedekking_tx (kwaliteit_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_type_bedekking_tx_dmn_habitat_type_tx ON imna.habitat_type_bedekking_tx (habitat_type_id ASC)
+;
+
+CREATE INDEX IF NOT EXISTS IXFK_habitat_type_bedekking_tx_habitat ON imna.habitat_type_bedekking_tx (habitat_id ASC)
+;
+
+/* Create Foreign Key Constraints */
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat','FK_habitat_habitat_package',
+'ALTER TABLE imna.habitat ADD CONSTRAINT FK_habitat_habitat_package
+	FOREIGN KEY (package_id) REFERENCES imna.habitat_package (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_documentatie','FK_habitat_documentatie_habitat_package',
+'ALTER TABLE imna.habitat_documentatie ADD CONSTRAINT FK_habitat_documentatie_habitat_package
+	FOREIGN KEY (package_id) REFERENCES imna.habitat_package (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','FK_habitat_package_dmn_bronhouder',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT FK_habitat_package_dmn_bronhouder
+	FOREIGN KEY (package_bronhouder_id) REFERENCES masterdata.dmn_bronhouder (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','FK_habitat_package_dmn_habitat_package_type',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT FK_habitat_package_dmn_habitat_package_type
+	FOREIGN KEY (package_type_id) REFERENCES masterdata.dmn_habitat_package_type (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','FK_habitat_package_dmn_habitat_package_versie',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT FK_habitat_package_dmn_habitat_package_versie
+	FOREIGN KEY (package_versie_id) REFERENCES masterdata.dmn_habitat_package_versie (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','FK_habitat_package_dmn_methodiek_document_versie',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT FK_habitat_package_dmn_methodiek_document_versie
+	FOREIGN KEY (methodiek_document_versie_id) REFERENCES masterdata.dmn_methodiek_document_versie (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','FK_habitat_package_dmn_package_kwaliteit',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT FK_habitat_package_dmn_package_kwaliteit
+	FOREIGN KEY (package_kwaliteit_id) REFERENCES masterdata.dmn_package_kwaliteit (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','FK_habitat_package_natura_2000',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT FK_habitat_package_natura_2000
+	FOREIGN KEY (gebied_id) REFERENCES natura_2000.natura_2000 (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_package','FK_habitat_package_natura_2000_gebied_voortouwnemer',
+'ALTER TABLE imna.habitat_package ADD CONSTRAINT FK_habitat_package_natura_2000_gebied_voortouwnemer
+	FOREIGN KEY (gebied_id,package_bronhouder_id) REFERENCES natura_2000.natura_2000_gebied_voortouwnemer (natura_2000_id,voortouw_nemer_id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_type_bedekking_t0','FK_habitat_type_bedekking_t0_dmn_habitat_kwaliteit_t0',
+'ALTER TABLE imna.habitat_type_bedekking_t0 ADD CONSTRAINT FK_habitat_type_bedekking_t0_dmn_habitat_kwaliteit_t0
+	FOREIGN KEY (kwaliteit_id) REFERENCES masterdata.dmn_habitat_kwaliteit_t0 (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_type_bedekking_t0','FK_habitat_type_bedekking_t0_dmn_habitat_type_to',
+'ALTER TABLE imna.habitat_type_bedekking_t0 ADD CONSTRAINT FK_habitat_type_bedekking_t0_dmn_habitat_type_to
+	FOREIGN KEY (habitat_type_id) REFERENCES masterdata.dmn_habitat_type_t0 (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_type_bedekking_t0','FK_habitat_type_bedekking_t0_habitat',
+'ALTER TABLE imna.habitat_type_bedekking_t0 ADD CONSTRAINT FK_habitat_type_bedekking_t0_habitat
+	FOREIGN KEY (habitat_id) REFERENCES imna.habitat (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_type_bedekking_tx','FK_habitat_type_bedekking_tx_dmn_habitat_kwaliteit_tx',
+'ALTER TABLE imna.habitat_type_bedekking_tx ADD CONSTRAINT FK_habitat_type_bedekking_tx_dmn_habitat_kwaliteit_tx
+	FOREIGN KEY (kwaliteit_id) REFERENCES masterdata.dmn_habitat_kwaliteit_tx (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_type_bedekking_tx','FK_habitat_type_bedekking_tx_dmn_habitat_type_tx',
+'ALTER TABLE imna.habitat_type_bedekking_tx ADD CONSTRAINT FK_habitat_type_bedekking_tx_dmn_habitat_type_tx
+	FOREIGN KEY (habitat_type_id) REFERENCES masterdata.dmn_habitat_type_tx (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+SELECT pg_temp.create_constraint_if_not_exists ('imna','habitat_type_bedekking_tx','FK_habitat_type_bedekking_tx_habitat',
+'ALTER TABLE imna.habitat_type_bedekking_tx ADD CONSTRAINT FK_habitat_type_bedekking_tx_habitat
+	FOREIGN KEY (habitat_id) REFERENCES imna.habitat (id) ON DELETE No Action ON UPDATE No Action
+;');
+
+/* Create Table Comments, Sequences for Autonumber Columns */
+
+COMMENT ON TABLE imna.habitat
+	IS 'IMNA: Definitie: Een   geografisch   gebied   met   een   karakteristieke samenstelling   van ecologische condities, processen, structuur en functies die de organismen ondersteunen die er leven. Subtype van:Terrein Toelichting: Een habitattype bevat minimaal een landelijke typering met bijbehorende bedekking.'
+;
+
+COMMENT ON COLUMN imna.habitat.identificatie
+	IS 'IMNA: Attribuut:  habitatID Type: NEN3610ID Definitie :Unieke code van het habitatobject  Toelichting: NL.IMNa.bronhoudercode.lokaalid    Actual implementation is different Type: String(100) Description: Value will the id of the habitat from the user.'
+;
+
+COMMENT ON COLUMN imna.habitat.bron
+	IS 'IMNA:  Definitie: Gebruikte   bronnen   waarmee   de   bepaling   van habitattypen   heeft plaatsgevonden.  Toelichting: Bijvoorbeeld packageID van vegetatiekartingpackage'
+;
+
+COMMENT ON COLUMN imna.habitat.veldsituatie_datum
+	IS 'IMNA: Definitie: datum van de veldsituatie waarop de basisinformatie betrekking heeft '
+;
+
+COMMENT ON COLUMN imna.habitat.geometrie
+	IS 'Application FME Validations:  	1. Basic OGC validation 	2. No self intersect 	3. Must have single line or area 	4. No self overlap'
+;
+
+COMMENT ON COLUMN imna.habitat.opmerking
+	IS 'IMNA: Definitie: Dit veld geeft de mogelijkheid om een algemene opmerking horende bij alle habitttypen in een vlak op te nemen. Toelichting: Het veld ''opmerking'' bij habitatTypeBedekking kan gebruikt worden om een specificatie van de onderbouwing voor ieder habitattype in een vlak apart te geven.'
+;
+
+COMMENT ON TABLE imna.habitat_documentatie
+	IS 'Bevat alle relevante bestanden aangeleverd voor deze HabitatPackage. Dit zijn in ieder geval  	1. De FGDB met de Geometrische gegevens 	2. Het verantwoordings document'
+;
+
+COMMENT ON COLUMN imna.habitat_documentatie.document_naam
+	IS 'Bestands naam'
+;
+
+COMMENT ON COLUMN imna.habitat_documentatie.document_uri
+	IS 'Download URL naar het bestand'
+;
+
+COMMENT ON COLUMN imna.habitat_documentatie.verantwoordings_document
+	IS 'Indicatie of dit bestand het verantwoordings document betreft'
+;
+
+COMMENT ON COLUMN imna.habitat_documentatie.bron_bestand
+	IS 'Indicatie of dit het Geometrische FGDB bestand betref'
+;
+
+COMMENT ON TABLE imna.habitat_package
+	IS 'IMNA: Definitie:  Een  habitattypepackage  is  een gebundelde  set  van  samenhangende gegevens  over  habitat  die  binnen  een  door  tijd  en ruimte  afgebakende onderzoeksopdracht worden  verzameld  en  geanalyseerd.  Deze package bevat    gegevens    die    in    het werkveld    ook    habitattypenkaart    of habitatkartering wordt genoemd.   Herkomst:IMNa Subtype van:Terrein  Toelichting: Een  habitattypepackage  bestaat minimaal  uit  een  habitatkartering  met bedekkingspercentages.  Bijvoorbeeld: Strabrechtse  Heide  &  Beuven  en Stelkampsveld. '
+;
+
+COMMENT ON COLUMN imna.habitat_package.identificatie
+	IS 'IMNA: Attribuut: packageID Type: NEN3610ID Definitie: Unieke code van de vegetatiepackage  Toelichting: Het packageID is als volgt opgebouwd: NL.IMNa.bronhoudercode.lokaalid. Lokaal ID kan conform methodiekdocument (o.a. nummer van gebied).  Multipliciteit:1  Actual implementation is different Type: String(100) Description: Value will automatically be calculated by setting it to gebiedNummer + packageType + packageVersie The field is not part of the upload and cannot be changed by the user.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.begin_geldigheid
+	IS 'IMNA Definitie: Start van de periode waarop deze instantie van het object geldig is in de werkelijkheid.   This field will be automatically calculated by the system.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.eind_geldigheid
+	IS 'IMNA Definitie: eind van de periode waarop deze instantie van het object geldig is in de werkelijkheid. Wanneer deze waarde niet is ingevuld is de instantie nog geldig   This field will be automatically calculated by the system.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.begin_tijd
+	IS 'IMNA Definitie: Tijdstip waarop het object in de werkelijkheid is ontstaan.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.eind_tijd
+	IS 'IMNA Definitie: Tijdstip waarop het object in de werkelijk niet meer geldig is.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.gebied_id
+	IS 'IMNA: Definitie: Het nummer van het Natura 2000-gebied volgens het (ontwerp)besluit  Toelichting: Het nummer betreft de Nederlandse nummering, niet de Europese '
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_bronhouder_id
+	IS 'IMNA:  Definitie: Bronhouder van de habitatpackage  Toelichting: Bronhouders  zijn  eindverantwoordelijk  voor  de informatie  die  in  de habitatpackage is opgenomen  This is a reference to the domain DomainBronhouder. The values in this domain are obtained from LNV. So Bronhouder to us is equivalent to VoortouwNemer.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_inwinner
+	IS 'IMNA: Definitie: Inwinner van de informatie uit de habitatpackage  Toelichting: Bijvoorbeeld provincie die habitattypekaart heeft gemaakt. '
+;
+
+COMMENT ON COLUMN imna.habitat_package.ingediend_door
+	IS 'this will be the userId of the user who submitted the package'
+;
+
+COMMENT ON COLUMN imna.habitat_package.vast_gesteld
+	IS 'Indicated specifying if this is the official version that should be publicly available.  Note that only ONE package can have this set to true per  	1. gebiedsNummer 	2. packageType (Leefgebied of Habitat) 	3. packageVersion (T0, T1...)'
+;
+
+COMMENT ON COLUMN imna.habitat_package.vast_gesteld_door
+	IS 'UserId of the user who set the vasteGesteld attribute to true. If the the vasteGesteld attribute is set to false this field will be cleared.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.vast_gesteld_op
+	IS 'Date and Time on which the vasteGesteld attribute is set to true. If the the vasteGesteld attribute is set to false this field will be cleared.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_kwaliteit_id
+	IS 'IMNA: Attribuut: packageKwaliteit Type:  Kwaliteitslabel Definitie: Kwaliteit van de datapackage conform codelijst Kwaliteitslabel   The IPH group will store their generic findings of their review in this field. The values they can choose are denoted by the domain DomainPackageKwaliteit Per default the value will be N meaning no review has yet been done.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_kwaliteit_door
+	IS 'UserId of the user who set the packageQuality attribute.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_kwaliteit_op
+	IS 'Date and Time on which the packageQuality attribute is set.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_naam
+	IS 'IMNA:  Not in IMNA.  Name of the package as specified in the upload by the user.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_toelichting
+	IS 'IMNA: Attribuut: packageToelichting Definitie: Toelichtingvan de habitatpackage '
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_geometrie
+	IS 'Application FME Validations:  	1. Must have areas 	2. Basic OGC validation 	3. No self intersect'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_type_id
+	IS 'Denotes the type of data in the Package. The field is validated against a domain and can have currently only have the values: H = Habitat L = Leefgebied  Only H is in scope for the first release.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_versie_id
+	IS 'A new version of package for a Habitat 2000 area is released every 12 years. The version is validated against a domain that has the values:  T0 - Initial version of Natura 2000 area creataion T1 - second version  etc.  For the first release on T0 is in scope.'
+;
+
+COMMENT ON COLUMN imna.habitat_package.package_volgnummer
+	IS 'Sequence number denoting the sub version / upload for a certain   	1. Natura 2000 area referenced by GebiedsNummber 	2. packageType (L or H) 	3. packageVersion (T0 / T1)   Multiple versions of can exist for the above combination, and uploads can continue until the IPH review group approves'
+;
+
+COMMENT ON COLUMN imna.habitat_package.methodiek_document_versie_id
+	IS 'IMNA: Definitie:  Versienummer  van  het  gebruikte methodiekdocument  voor  habitattype kartering. Toelichting: In te vullen conform codelijst ''MethodiekDocumentVersie'''
+;
+
+COMMENT ON TABLE imna.habitat_type_bedekking_t0
+	IS 'IMNA: Definitie: Beschrijft  het  habitatvlak  met  informatie  over habitattype,  bedekking  en kwaliteit. '
+;
+
+COMMENT ON COLUMN imna.habitat_type_bedekking_t0.bedekkings_percentage
+	IS 'Application FME Validations:  	1. bedekkingsPercentatge must be between 99% and 101% per Habitat'
+;
+
+COMMENT ON TABLE imna.habitat_type_bedekking_tx
+	IS 'IMNA: Definitie: Beschrijft  het  habitatvlak  met  informatie  over habitattype,  bedekking  en kwaliteit. '
+;
+
+COMMENT ON COLUMN imna.habitat_type_bedekking_tx.bedekkings_percentage
+	IS 'Application FME Validations:  	1. bedekkingsPercentatge must be between 99% and 101% per Habitat'
+;
+
+GRANT SELECT, UPDATE ON imna.habitat_package TO ndvh_geoweb;
+GRANT SELECT ON imna.habitat TO ndvh_geoweb;
+GRANT SELECT ON imna.habitat_type_bedekking_t0 TO ndvh_geoweb;
+GRANT SELECT ON imna.habitat_type_bedekking_tx TO ndvh_geoweb;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA imna TO anlb_sqlpad;

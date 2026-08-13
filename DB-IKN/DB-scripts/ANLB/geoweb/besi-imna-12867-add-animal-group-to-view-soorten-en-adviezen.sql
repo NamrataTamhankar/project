@@ -1,0 +1,35 @@
+--DROP VIEW geoweb.v_besi_soorten_en_adviezen;
+--
+---CREATE OR REPLACE VIEW geoweb.v_besi_soorten_en_adviezen
+--- AS
+--- SELECT DISTINCT r.id AS request_id, 
+---				 t.name AS name,
+---				 a.description,
+---				 rt.beschrijving_habitat AS report_text_beschrijving_habitat, 
+---				 rt.gevoeligheid AS report_text_gevoeligheid, 
+---				 rt.advies AS report_text_advies
+---  FROM geoweb.besi_report_request r
+---  JOIN besi.v_gw_besi_star s ON s.grid_id = ANY (r.grid_ids) AND s.werkzaamheid_id = r.werkzaamheid_id
+---  JOIN besi.taxa_rapport_text rt on (rt.taxa_id = s.taxa_id)
+---  JOIN ndff.taxa t ON (T.id = s.taxa_id)
+---  JOIN besi.besi_taxa b on (b.taxa_id = s.taxa_id)
+---  JOIN masterdata.dmn_animal_group a on (a.id = b.animal_group_id)
+---  UNION
+---  SELECT DISTINCT r.id AS request_id, 
+---				 t.name AS name, 
+---				 a.description,
+---				 rt.beschrijving_habitat AS report_text_beschrijving_habitat, 
+---				 rt.gevoeligheid AS report_text_gevoeligheid, 
+---				 rt.advies AS report_text_advies
+---  FROM geoweb.besi_report_request r
+---  JOIN besi.v_gw_besi_star_besi_species_group s ON s.grid_id = ANY (r.grid_ids) AND s.werkzaamheid_id = r.werkzaamheid_id
+---  JOIN besi.besi_species_group_rapport_text rt on (rt.besi_species_group_id = s.besi_species_group_id)
+---  JOIN besi.besi_species_group t ON (T.id = s.besi_species_group_id)
+---  JOIN masterdata.dmn_animal_group a on (a.id = t.animal_group_id);
+---
+---ALTER TABLE geoweb.v_besi_soorten_en_adviezen
+---    OWNER TO anlb;
+---	
+--GRANT SELECT ON TABLE geoweb.v_besi_soorten_en_adviezen TO besi_readonly;
+--GRANT SELECT ON TABLE geoweb.v_besi_soorten_en_adviezen TO besi_geoweb;
+--GRANT SELECT ON TABLE geoweb.v_besi_soorten_en_adviezen TO anlb_sqlpad;
